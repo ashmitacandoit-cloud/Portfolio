@@ -1,28 +1,65 @@
-document.querySelectorAll('nav a').forEach(link => {
-    link.addEventListener('click', function(e) {
-        const target = document.querySelector(this.getAttribute('href'));
+document.querySelectorAll("nav a").forEach(link => {
+    link.addEventListener("click", function (e) {
+        e.preventDefault();
 
-        if (target) {
-            e.preventDefault();
-            target.scrollIntoView({
-                behavior: 'smooth'
+        const targetId = this.getAttribute("href");
+        const targetSection = document.querySelector(targetId);
+
+        if (targetSection) {
+            targetSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
             });
         }
     });
 });
-document.querySelector("button").addEventListener("click", () => {
-    alert("Hi! 🌸 Thanks for visiting my portfolio!");
-});
+
+const button = document.querySelector("button");
+
+if (button) {
+    button.addEventListener("click", () => {
+        alert("Hi! 🌸 Thanks for visiting my portfolio!");
+    });
+}
 
 const sections = document.querySelectorAll("section");
 
-window.addEventListener("scroll", () => {
-    sections.forEach(section => {
-        const position = section.getBoundingClientRect().top;
+const observer = new IntersectionObserver(
+    (entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("show");
+            }
+        });
+    },
+    {
+        threshold: 0.15
+    }
+);
 
-        if (position < window.innerHeight - 100) {
-            section.style.opacity = "1";
-            section.style.transform = "translateY(0)";
-        }
-    });
+sections.forEach((section) => {
+    observer.observe(section);
 });
+
+const navLinks = document.querySelectorAll("nav a");
+
+const highlightObserver = new IntersectionObserver(
+    (entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.remove("active");
+
+                    if (link.getAttribute("href").substring(1) === entry.target.id) {
+                        link.classList.add("active");
+                    }
+                });
+            }
+        });
+    },
+    { threshold: 0.5 }
+);
+
+sections.forEach(section => {
+    highlightObserver.observe(section);
+}); 
